@@ -1,2 +1,4 @@
 ESE140206/*
 *.env
+__pycache__/
+*.pyc
