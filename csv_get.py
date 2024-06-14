@@ -14,7 +14,7 @@ url = "https://api.edinet-fsa.go.jp/api/v2/documents/{}?Subscription-Key={}&type
 response = requests.get(url)
 
 if response.status_code == 200:
-    with open("{}.zip".format(doc_id), "wb") as file:
+    with open("CSV_{}.zip".format(doc_id), "wb") as file:
         file.write(response.content)
     print("ファイルが正常にダウンロードされました")
 else:
@@ -28,8 +28,8 @@ with zipfile.ZipFile("{}.zip".format(doc_id), "r") as zip_ref:
     zip_ref.extractall(".")
 print("ファイルが正常に解凍されました")
 
-os.remove("{}.zip".format(doc_id))
+os.remove("CSV_{}.zip".format(doc_id))
 print("zipファイルを削除しました")
 
-os.rename("XBRL_TO_CSV", doc_id)
+os.rename("XBRL_TO_CSV", "CSV_" + doc_id)
 print("フォルダ名が正常に変更されました")
