@@ -2,3 +2,5 @@ ESE140206/*
 *.env
 __pycache__/
 *.pyc
+
+XBRL_*
