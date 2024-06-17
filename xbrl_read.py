@@ -22,14 +22,47 @@ def detect_xbrl(dir_name):
     return file_name
 
 
-def get_xbrl_data(doc_id):
+def get_xbrl_data(doc_id, sec_code, filter_name):
     target_xbrl_file = detect_xbrl(doc_id)
 
     with open(target_xbrl_file, "r", encoding="utf-8") as file:
         xbrl_content = file.read()
 
+    os.chdir("..")
+    os.chdir("..")
+
     soup = BeautifulSoup(xbrl_content, features="xml")
-    data = []
+    data = {
+        "secCode": sec_code,
+        "docID": doc_id,
+        "name": filter_name,
+        "plResult": {
+            "netSales": "",
+            "operatingRevenue1": "",
+            "grossProfit": "",
+            "operatingIncome": "",
+            "ordinaryIncome": "",
+            "incomeBeforeIncomeTaxes": "",
+            "profitLoss": "",
+        },
+        "bsResult": {
+            "currentAssets": "",
+            "cash": "",
+            "accountsReceivable": "",
+            "investmentSecurities": "",
+            "assets": "",
+            "netAssets": "",
+            "liabilities": "",
+        },
+        "cashFlowResult": {
+            "depreciationAndAmortization": "",
+            "impairmentLoss": "",
+            "operatingActivities": "",
+            "investmentActivities": "",
+            "financingActivities": "",
+            "dividendsPaid": "",
+        },
+    }
     # 売上
     revenues = soup.find("jppfs_cor:NetSales", contextRef="CurrentYearDuration")
     if revenues is None:
@@ -37,7 +70,7 @@ def get_xbrl_data(doc_id):
             "jppfs_cor:NetSales", contextRef="CurrentYearDuration_NonConsolidatedMember"
         )
     if revenues is not None:
-        data.append({"売上": revenues.text})
+        data["plResult"]["netSales"] = revenues.text
 
     # 営業収益
     operating_revenue = soup.find(
@@ -49,7 +82,7 @@ def get_xbrl_data(doc_id):
             contextRef="CurrentYearDuration_NonConsolidatedMember",
         )
     if operating_revenue is not None:
-        data.append({"営業収益": operating_revenue.text})
+        data["plResult"]["operatingRevenue1"] = operating_revenue.text
 
     # 売上総利益
     gross_profit = soup.find("jppfs_cor:GrossProfit", contextRef="CurrentYearDuration")
@@ -59,7 +92,7 @@ def get_xbrl_data(doc_id):
             contextRef="CurrentYearDuration_NonConsolidatedMember",
         )
     if gross_profit is not None:
-        data.append({"売上総利益": gross_profit.text})
+        data["plResult"]["grossProfit"] = gross_profit.text
 
     # 営業利益
     operating_income = soup.find(
@@ -71,7 +104,7 @@ def get_xbrl_data(doc_id):
             contextRef="CurrentYearDuration_NonConsolidatedMember",
         )
     if operating_income is not None:
-        data.append({"営業利益": operating_income.text})
+        data["plResult"]["operatingIncome"] = operating_income.text
 
     # 経常利益
     ordinary_income = soup.find(
@@ -83,7 +116,7 @@ def get_xbrl_data(doc_id):
             contextRef="CurrentYearDuration_NonConsolidatedMember",
         )
     if ordinary_income is not None:
-        data.append({"経常利益": ordinary_income.text})
+        data["plResult"]["ordinaryIncome"] = ordinary_income.text
 
     # 税引き前当期純利益
     income_before_tax = soup.find(
@@ -95,7 +128,7 @@ def get_xbrl_data(doc_id):
             contextRef="CurrentYearDuration_NonConsolidatedMember",
         )
     if income_before_tax is not None:
-        data.append({"税引き前当期純利益": income_before_tax.text})
+        data["plResult"]["incomeBeforeIncomeTaxes"] = income_before_tax.text
 
     # 当期純利益
     profit_loss = soup.find("jppfs_cor:ProfitLoss", contextRef="CurrentYearDuration")
@@ -105,7 +138,7 @@ def get_xbrl_data(doc_id):
             contextRef="CurrentYearDuration_NonConsolidatedMember",
         )
     if profit_loss is not None:
-        data.append({"当期純利益": profit_loss.text})
+        data["plResult"]["profitLoss"] = profit_loss.text
 
     # 減価償却費
     depreciation = soup.find(
@@ -117,7 +150,7 @@ def get_xbrl_data(doc_id):
             contextRef="CurrentYearDuration_NonConsolidatedMember",
         )
     if depreciation is not None:
-        data.append({"減価償却費": depreciation.text})
+        data["cashFlowResult"]["depreciationAndAmortization"] = depreciation.text
 
     # 減損損失
     impairment_loss = soup.find(
@@ -130,7 +163,7 @@ def get_xbrl_data(doc_id):
             contextRef="CurrentYearDuration_NonConsolidatedMember",
         )
     if impairment_loss is not None:
-        data.append({"減損損失": impairment_loss.text})
+        data["cashFlowResult"]["impairmentLoss"] = impairment_loss.text
 
     # 営業活動によるキャッシュフロー
     operating_cash_flow = soup.find(
@@ -143,7 +176,7 @@ def get_xbrl_data(doc_id):
             contextRef="CurrentYearDuration_NonConsolidatedMember",
         )
     if operating_cash_flow is not None:
-        data.append({"営業活動によるキャッシュフロー": operating_cash_flow.text})
+        data["cashFlowResult"]["operatingActivities"] = operating_cash_flow.text
 
     # 投資活動によるキャッシュフロー
     investment_cash_flow = soup.find(
@@ -156,7 +189,7 @@ def get_xbrl_data(doc_id):
             contextRef="CurrentYearDuration_NonConsolidatedMember",
         )
     if investment_cash_flow is not None:
-        data.append({"投資活動によるキャッシュフロー": investment_cash_flow.text})
+        data["cashFlowResult"]["investmentActivities"] = investment_cash_flow.text
 
     # 財務活動によるキャッシュフロー
     financing_cash_flow = soup.find(
@@ -169,7 +202,7 @@ def get_xbrl_data(doc_id):
             contextRef="CurrentYearDuration_NonConsolidatedMember",
         )
     if financing_cash_flow is not None:
-        data.append({"財務活動によるキャッシュフロー": financing_cash_flow.text})
+        data["cashFlowResult"]["financingActivities"] = financing_cash_flow.text
 
     # 配当金の支払い
     dividend_payment = soup.find(
@@ -181,7 +214,7 @@ def get_xbrl_data(doc_id):
             contextRef="CurrentYearDuration_NonConsolidatedMember",
         )
     if dividend_payment is not None:
-        data.append({"配当金の支払い": dividend_payment.text})
+        data["cashFlowResult"]["dividendsPaid"] = dividend_payment.text
 
     # 流動資産
     current_assets = soup.find(
@@ -193,7 +226,7 @@ def get_xbrl_data(doc_id):
             contextRef="CurrentYearInstant_NonConsolidatedMember",
         )
     if current_assets is not None:
-        data.append({"流動資産": current_assets.text})
+        data["bsResult"]["currentAssets"] = current_assets.text
 
     # 現金及び預金
     cash_and_deposit = soup.find(
@@ -205,7 +238,7 @@ def get_xbrl_data(doc_id):
             contextRef="CurrentYearInstant_NonConsolidatedMember",
         )
     if cash_and_deposit is not None:
-        data.append({"現金及び預金": cash_and_deposit.text})
+        data["bsResult"]["cash"] = cash_and_deposit.text
 
     # 売掛金
     accounts_receivable = soup.find(
@@ -217,7 +250,7 @@ def get_xbrl_data(doc_id):
             contextRef="CurrentYearInstant_NonConsolidatedMember",
         )
     if accounts_receivable is not None:
-        data.append({"売掛金": accounts_receivable.text})
+        data["bsResult"]["accountsReceivable"] = accounts_receivable.text
 
     # 投資有価証券
     investment_securities = soup.find(
@@ -229,7 +262,7 @@ def get_xbrl_data(doc_id):
             contextRef="CurrentYearInstant_NonConsolidatedMember",
         )
     if investment_securities is not None:
-        data.append({"投資有価証券": investment_securities.text})
+        data["bsResult"]["investmentSecurities"] = investment_securities.text
 
     # 資産
     assets = soup.find("jppfs_cor:Assets", contextRef="CurrentYearInstant")
@@ -239,7 +272,7 @@ def get_xbrl_data(doc_id):
             contextRef="CurrentYearInstant_NonConsolidatedMember",
         )
     if assets is not None:
-        data.append({"資産": assets.text})
+        data["bsResult"]["assets"] = assets.text
 
     # 純資産
     net_assets = soup.find("jppfs_cor:NetAssets", contextRef="CurrentYearInstant")
@@ -249,7 +282,7 @@ def get_xbrl_data(doc_id):
             contextRef="CurrentYearInstant_NonConsolidatedMember",
         )
     if net_assets is not None:
-        data.append({"純資産": net_assets.text})
+        data["bsResult"]["netAssets"] = net_assets.text
 
     # 負債
     liabilities = soup.find("jppfs_cor:Liabilities", contextRef="CurrentYearInstant")
@@ -259,11 +292,5 @@ def get_xbrl_data(doc_id):
             contextRef="CurrentYearInstant_NonConsolidatedMember",
         )
     if liabilities is not None:
-        data.append({"負債": liabilities.text})
-    for d in data:
-        print(d)
+        data["bsResult"]["liabilities"] = liabilities.text
     return data
-
-
-# doc_id = input("ファイル名:")
-# get_xbrl_data(doc_id)
