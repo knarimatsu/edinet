@@ -16,7 +16,8 @@ def get_id_list():
     api_key = os.environ["API_KEY"]
     url = "https://api.edinet-fsa.go.jp/api/v2/documents.json"
     yesterday = datetime.date.today() - datetime.timedelta(days=1)
-    params = {"date": str(yesterday), "type": 2, "Subscription-Key": api_key}
+    today = datetime.date.today()
+    params = {"date": str(today), "type": 2, "Subscription-Key": api_key}
 
     response = requests.get(url, params=params)
     json_data = json.loads(response.text)
@@ -33,6 +34,12 @@ def get_id_list():
 
     docid_list = []
     for data in data_list:
-        docid_list.append(data["docID"])
+        docid_list.append(
+            {
+                "docID": data["docID"],
+                "secCode": data["secCode"],
+                "name": data["filerName"],
+            }
+        )
 
     return docid_list
