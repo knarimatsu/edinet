@@ -11,14 +11,20 @@ load_dotenv()
 
 
 def get_id_list():
-    pattern = re.compile(r"有価証券報告書*")
 
+    pattern = re.compile(r"有価証券報告書*")
     api_key = os.environ["API_KEY"]
     url = "https://api.edinet-fsa.go.jp/api/v2/documents.json"
-    yesterday = datetime.date.today() - datetime.timedelta(days=1)
     today = datetime.date.today()
-    params = {"date": str(today), "type": 2, "Subscription-Key": api_key}
+    yesterday = datetime.date.today() - datetime.timedelta(days=1)
 
+    # 平日でない場合はデータ取得を行わない
+    if today.weekday() == 6 or today.weekday() == 0:
+        print("平日ではないのでデータ取得を完了します")
+        return None
+
+    print("データ取得を開始します")
+    params = {"date": str(yesterday), "type": 2, "Subscription-Key": api_key}
     response = requests.get(url, params=params)
     json_data = json.loads(response.text)
     results = json_data["results"]
@@ -31,6 +37,9 @@ def get_id_list():
             results,
         )
     )
+    if len(data_list) == 0:
+        print("データがありませんでした")
+        return None
 
     docid_list = []
     for data in data_list:
