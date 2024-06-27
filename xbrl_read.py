@@ -24,6 +24,12 @@ def detect_xbrl(dir_name):
 
 
 def find_data(soup, tag_name, context_ref, context_ref_nonconsolidatedMember):
+    """_summary_
+
+    Returns:
+        _type_: _description_
+    """
+
     result = soup.find(tag_name, contextRef=context_ref)
     if result is None:
         result = soup.find(tag_name, contextRef=context_ref_nonconsolidatedMember)
@@ -34,6 +40,17 @@ def find_data(soup, tag_name, context_ref, context_ref_nonconsolidatedMember):
 
 
 def get_xbrl_data(doc_id, sec_code, filter_name):
+    """_summary_
+
+    Args:
+        doc_id (_type_): _description_
+        sec_code (_type_): _description_
+        filter_name (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     target_xbrl_file = detect_xbrl(doc_id)
 
     with open(target_xbrl_file, "r", encoding="utf-8") as file:

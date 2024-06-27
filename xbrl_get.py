@@ -8,6 +8,11 @@ load_dotenv()
 
 
 def download_xbrl_file(doc_id: str):
+    """
+    XBRLファイルをダウンロードし、解凍する関数
+    Args:
+        doc_id (str): 取得するべきXBRLファイルのdoc_id
+    """
     api_key = os.environ["API_KEY"]
     url = "https://api.edinet-fsa.go.jp/api/v2/documents/" + doc_id
 
