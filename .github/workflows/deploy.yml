@@ -34,5 +34,5 @@ jobs:
             - name: lambda update
               run: |
                   pip3 install awscli
-                  cd lambda && zip -r package.zip ./*
+                  cd . && zip -r package.zip ./*
                   aws lambda update-function-code --function-name edinet_database --zip-file fileb://package.zip --publish
