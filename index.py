@@ -1,10 +1,8 @@
 import json
-import aiohttp
-import asyncio
 from time import sleep
 from get_docid import get_id_list
 from xbrl_get import download_xbrl_file
-from xbrl_read import detect_xbrl, get_xbrl_data
+from xbrl_read import get_xbrl_data
 from dynamodb import dynamodb_put
 
 
