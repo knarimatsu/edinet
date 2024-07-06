@@ -16,7 +16,7 @@ def get_id_list():
     api_key = os.environ["API_KEY"]
     url = "https://api.edinet-fsa.go.jp/api/v2/documents.json"
     today = datetime.date.today()
-    yesterday = datetime.date.today() - datetime.timedelta(days=1)
+    yesterday = datetime.date.today() - datetime.timedelta(days=3)
 
     # 平日でない場合はデータ取得を行わない
     if today.weekday() == 6 or today.weekday() == 0:

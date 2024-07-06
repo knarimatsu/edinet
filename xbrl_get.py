@@ -3,6 +3,7 @@ import requests
 import os
 from dotenv import load_dotenv
 import zipfile
+import boto3
 
 load_dotenv()
 
@@ -37,8 +38,18 @@ def download_xbrl_file(doc_id: str):
         zip_ref.extractall(".")
     print("ファイルが正常に解凍されました")
 
+    # zipファイルを削除
     os.remove("XBRL_" + doc_id + ".zip")
     print("XBRLのzipファイルを削除しました")
 
+    # フォルダ名を変更
     os.rename("XBRL", "XBRL_" + doc_id)
     print("フォルダ名が正常に変更されました")
+
+    # S3にアップロード
+    s3 = boto3.client("s3")
+    bucket_name = os.environ["BUCKET_NAME"]
+    # 変更したフォルダをS3にアップロード
+
+
+download_xbrl_file("S100TYEA")
