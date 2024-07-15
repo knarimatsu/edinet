@@ -2,13 +2,26 @@
 import os
 from lxml import etree
 from bs4 import BeautifulSoup
-from xbrl_content_list import xbrl_content_list
+from lib.xbrl_content_list import xbrl_content_list
+import boto3
+import re
+from dotenv import load_dotenv
+import json
+from lib.find_data import find_data
+from lib.data_structure import data_structure
 
+
+load_dotenv()
 xbrl_file_path = ""
+s3_client = boto3.client(
+    "s3",
+    aws_access_key_id=os.environ["AWS_ACCESS_KEY_ID"],
+    aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
+)
 
 
-def detect_xbrl(dir_name):
-    os.chdir("XBRL_" + dir_name)
+def detect_xbrl(doc_id):
+    os.chdir("XBRL_" + doc_id)
     os.chdir("PublicDoc")
     file_name = None
     for file in os.listdir():
@@ -21,22 +34,6 @@ def detect_xbrl(dir_name):
         exit()
 
     return file_name
-
-
-def find_data(soup, tag_name, context_ref, context_ref_nonconsolidatedMember):
-    """_summary_
-
-    Returns:
-        _type_: _description_
-    """
-
-    result = soup.find(tag_name, contextRef=context_ref)
-    if result is None:
-        result = soup.find(tag_name, contextRef=context_ref_nonconsolidatedMember)
-    if result is not None:
-        return result.text
-    else:
-        return ""
 
 
 def get_xbrl_data(doc_id, sec_code, filter_name):
@@ -60,37 +57,7 @@ def get_xbrl_data(doc_id, sec_code, filter_name):
     os.chdir("..")
 
     soup = BeautifulSoup(xbrl_content, features="xml")
-    data = {
-        "secCode": sec_code,
-        "docID": doc_id,
-        "name": filter_name,
-        "plResult": {
-            "netSales": "",
-            "operatingRevenue1": "",
-            "grossProfit": "",
-            "operatingIncome": "",
-            "ordinaryIncome": "",
-            "incomeBeforeIncomeTaxes": "",
-            "profitLoss": "",
-        },
-        "bsResult": {
-            "currentAssets": "",
-            "cash": "",
-            "accountsReceivable": "",
-            "investmentSecurities": "",
-            "assets": "",
-            "netAssets": "",
-            "liabilities": "",
-        },
-        "cashFlowResult": {
-            "depreciationAndAmortization": "",
-            "impairmentLoss": "",
-            "operatingActivities": "",
-            "investmentActivities": "",
-            "financingActivities": "",
-            "dividendsPaid": "",
-        },
-    }
+    data = data_structure(sec_code, doc_id, filter_name)
 
     for item in xbrl_content_list:
         data[item["statement_type"]][item["item"]] = find_data(

@@ -1,9 +1,11 @@
 # XBRLファイルをダウンロードし、解凍するスクリプト
 import requests
 import os
+import shutil
 from dotenv import load_dotenv
 import zipfile
 import boto3
+import json
 
 load_dotenv()
 
@@ -20,12 +22,14 @@ def download_xbrl_file(doc_id: str):
     params = {"type": 1, "Subscription-Key": api_key}
 
     response = requests.get(url, params=params)
+    # print(json.dumps(response, indent=4, ensure_ascii=False))
 
     # XBRLファイルをダウンロード
     if response.status_code == 200:
         with open("XBRL_" + doc_id + ".zip", "wb") as file:
             file.write(response.content)
-        print("ファイルが正常にダウンロードされました")
+        print(doc_id + "のファイルが正常にダウンロードされました")
+        unzip_file(doc_id)
     else:
         print(
             "ファイルのダウンロードに失敗しました\nステータスコード:{}".format(
@@ -33,23 +37,37 @@ def download_xbrl_file(doc_id: str):
             )
         )
 
+
+def unzip_file(doc_id: str):
+    """zipファイルを解凍する関数
+
+    Args:
+        doc_id (str): _description_
+    """
+
     # zipファイルを解凍
     with zipfile.ZipFile("XBRL_" + doc_id + ".zip", "r") as zip_ref:
         zip_ref.extractall(".")
-    print("ファイルが正常に解凍されました")
+    print(doc_id + "のファイルが正常に解凍されました")
 
+
+def delete_zip_file(doc_id: str):
     # zipファイルを削除
     os.remove("XBRL_" + doc_id + ".zip")
-    print("XBRLのzipファイルを削除しました")
+    print(doc_id + "のXBRLのzipファイルを削除しました")
 
+
+def rename_file(doc_id: str):
     # フォルダ名を変更
     os.rename("XBRL", "XBRL_" + doc_id)
-    print("フォルダ名が正常に変更されました")
-
-    # S3にアップロード
-    s3 = boto3.client("s3")
-    bucket_name = os.environ["BUCKET_NAME"]
-    # 変更したフォルダをS3にアップロード
+    print(doc_id + "のフォルダ名が正常に変更されました")
 
 
-download_xbrl_file("S100TYEA")
+def delete_xbrl_dir(doc_id: str):
+    # "XBRL_" + doc_idのついたディレクトリを削除
+    xbrl_dir = "XBRL_" + doc_id
+    if os.path.exists(xbrl_dir):
+        shutil.rmtree(xbrl_dir)
+        print(doc_id + "のXBRLのディレクトリを削除しました")
+    else:
+        print("XBRLのディレクトリが見つかりません")
