@@ -29,7 +29,6 @@ def get_id_list():
     # if today.weekday() == 6 or today.weekday() == 0:
     #     print("平日ではないのでデータ取得を完了します")
     #     return None
-
     params = {"date": str(yesterday), "type": 2, "Subscription-Key": api_key}
     response = requests.get(url, params=params)
     json_data = json.loads(response.text)
