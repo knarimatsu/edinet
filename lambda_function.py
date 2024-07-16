@@ -44,6 +44,3 @@ def lambda_handler(event, context):
         "statusCode": 200,
         "body": json.dumps(docment_id_list, indent=4, ensure_ascii=False),
     }
-
-
-lambda_handler(None, None)

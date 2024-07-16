@@ -11,12 +11,14 @@ def get_date_range(start_date, end_date):
 
 
 # 例
+
 start_date = "2013-01-01"
+isLeapYear = lambda x: x % 4 == 0 and (x % 100 != 0 or x % 400 == 0)
 a_year_end_date = (
     datetime.strptime(start_date, "%Y-%m-%d")
     + timedelta(days=(365 if isLeapYear(int(start_date[:4])) else 364))
 ).strftime("%Y-%m-%d")
 
-isLeapYear = lambda x: x % 4 == 0 and (x % 100 != 0 or x % 400 == 0)
+
 dates = get_date_range(start_date, a_year_end_date)
 print(dates)
