@@ -1,6 +1,5 @@
 # XBRLファイルを読み込んで、必要なデータを取得するスクリプト
 import os
-from lxml import etree
 from bs4 import BeautifulSoup
 from lib.xbrl_content_list import xbrl_content_list
 import boto3
