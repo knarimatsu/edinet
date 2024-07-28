@@ -23,14 +23,15 @@ def get_id_list():
     api_key = os.environ["API_KEY"]
     url = "https://api.edinet-fsa.go.jp/api/v2/documents.json"
     today = datetime.date.today()
-    # yesterday = datetime.date.today() - datetime.timedelta(days=1)
+    yesterday = datetime.date.today() - datetime.timedelta(days=19)
 
     # 平日でない場合はデータ取得を行わない
-    if today.weekday() == 6 or today.weekday() == 0:
-        print("平日ではないのでデータ取得を完了します")
-        return None
+    # if today.weekday() == 6 or today.weekday() == 0:
+    #     print("平日ではないのでデータ取得を完了します")
+    #     return None
 
-    params = {"date": str(today), "type": 2, "Subscription-Key": api_key}
+    params = {"date": str(yesterday), "type": 2, "Subscription-Key": api_key}
+    # params = {"date": str(today), "type": 2, "Subscription-Key": api_key}
     response = requests.get(url, params=params)
     json_data = json.loads(response.text)
     results = json_data["results"]

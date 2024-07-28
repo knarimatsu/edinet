@@ -37,8 +37,8 @@ def lambda_handler(event, context):
         )
         print(json.dumps(data, indent=4, ensure_ascii=False))
         # ここにAPIを叩く処理を書く
-        put_response = dynamodb_put(data)
-        print(put_response)
+        # put_response = dynamodb_put(data)
+        # print(put_response)
 
     return {
         "statusCode": 200,
