@@ -30,6 +30,7 @@ def download_xbrl_file(doc_id: str):
             file.write(response.content)
         print(doc_id + "のファイルが正常にダウンロードされました")
         unzip_file(doc_id)
+        rename_file(doc_id)
     else:
         print(
             "ファイルのダウンロードに失敗しました\nステータスコード:{}".format(
@@ -53,13 +54,13 @@ def unzip_file(doc_id: str):
 
 def delete_zip_file(doc_id: str):
     # zipファイルを削除
-    os.remove("/tmp/XBRL_" + doc_id + ".zip")
+    os.remove("XBRL_" + doc_id + ".zip")
     print(doc_id + "のXBRLのzipファイルを削除しました")
 
 
 def rename_file(doc_id: str):
     # フォルダ名を変更
-    os.rename("XBRL", "/tmp/XBRL_" + doc_id)
+    os.rename("XBRL", "XBRL_" + doc_id)
     print(doc_id + "のフォルダ名が正常に変更されました")
 
 
